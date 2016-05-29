@@ -1,0 +1,611 @@
+%******************************************************************************
+%
+% KTHFrontpage package
+%
+% DESCRIPTION: This is a modified version of the KTHEEtitlepage package,
+%              the way of defining options has been changed to
+%              support printing several pages in the same document.
+%              This package is now not hardcoded for KTHEE.
+%              A template for an abstract page has been included also.
+%              No copyright infringement intended. Credits belongs to the
+%              original authors. Made for educational purposes.
+%%
+% OPTIONS:
+%       graphicspath: set which folder that contains the graphics
+%
+%
+% REQUIREMENTS: This package expects the following:
+%               For option \iprint[forWWW] it expects two image files
+%               with the names "kth-logo-colour-eng" and "kth-logo-colour-swe".
+%               For option \iprint[forPrint] it expects two image files
+%               with the names "kth-logo-bw-eng" and "kth-logo-bw-swe".
+%               If no images are detected or \iprint[noimage] is used,
+%               no image will be printed.
+%
+% COMMANDS:    \ititle{}, \isubtitle{}, idate{}, \irefnr{}, \iaddress{},
+%              \inotice{}, \iabstract{}, \iapproved{}, \icommissioner{},
+%              \icontact{}, \isupervisor{}, \iexaminer{}, \iidentifier{},
+%              \ikeywords{}, \makeiabstract and \makeititle.
+%
+% USAGE:       \usepackage{KTHFrontpage},
+%              \usepackage[graphicspath=gfx/]{KTHFrontpage}
+%              \begin{document}
+%                \ilang[eng]
+%                \ititle{My Title}
+%                \isubtitle{My Subtitle} % Optional
+%                \idate{May 2016}
+%                \makeititle
+%
+%                \ilang[swe]
+%                \ititle{Min Titel}
+%                \isubtitle{Min Undertitel} % Optional
+%                \idate{May 2016}
+%                \makeititle
+%                ... % The rest of the document
+%
+% LIMITATIONS: Currently only supports A4 paper size in a reasonable way.
+%
+% CONTRIBUTOR: hygerth
+%
+% DATE:        160529
+%
+%******************************************************************************
+% KTHEEtitlepage Package Information
+%******************************************************************************
+%
+% DESCRIPTION: Style file to add a title page for masters thesis,
+%              licentiate, doctoral thesis and internal reports
+%              according to the central KTH design, but with a EE
+%              logo.
+%%
+% OPTIONS:
+%       eng:            English text in the logo
+%       sve/swe:        Swedish text in the logo
+%       forPrint:       Gives a titlepage in black and white
+%                       (without any logo for the thesis formats)
+%       forWWW:         Gives titlepage in color with logo, intended
+%                       for web publishing.
+%       ireport:        Internal report
+%       exjobb:         master thesis report
+%       lic:            licentiate thesis report
+%       doktor:         PhD thesis report
+%       
+%       Default is exjobb, eng and forWWW.
+%
+% COMMANDS:    \ititle{}, \isubtitle{}, idate{}, \irefnr{}, \iaddress{}
+%              and \makeititle.
+%
+% USAGE:       \usepackage{KTHEEtitlepage},
+%              \usepackage[ireport,sve,forPrint]{KTHEEtitlepage}
+%              \begin{document}
+%                \ititle{My Title}
+%                \isubtitle{My Subtitle} % Optional
+%                \idate{March 2004}
+%                \irefnr{}
+%                \iaddress{} % Only for ireports!
+%                \makeititle
+%                ... % The rest of the document
+%
+% LIMITATIONS: Currently only supports A4 paper size in a reasonable way.
+%
+% AUTHORS:     Elisabet Molin, Mats Bengtsson, S3, KTH
+%
+% DATE:        040921
+%
+% Updated:      060503 Support for ireport, lic and doktor /mabe
+%               060807 Renamed to KTHEEtitlepage, added \submittedIEEE
+%                      and \publishedIEEE /mabe
+%               061006 Fixed problem if \subtitle wasn't set in
+%                      ireport /mabe
+%               061010 forPrint now gives B&W logo for ireport and
+%                      the title page is now centered even if the
+%                      remaining document isn't. Check if the babel
+%                      package is used to select swedish. /mabe
+%
+%******************************************************************************
+% Identification
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{KTHFrontpage}[2004/09/21 KTH frontpage package]
+\ProvidesFile{here_the_logos}[2004/09/21 KTH logo English, BW]
+\ProvidesFile{here_the_logos}[2004/09/21 KTH logo Swedish, BW]
+\ProvidesFile{here_the_logos}[2004/09/21 KTH logo Swedish, colour]
+\ProvidesFile{here_the_logos}[2004/09/21 KTH logo Swedish, colour]
+\RequirePackage{kvoptions}
+% automatic graphics switching
+\RequirePackage{graphicx,color} % for inserting the logos and
+                                % the background
+
+\RequirePackage{calc} % for the layout calculations
+\RequirePackage{etoolbox}
+\RequirePackage{array}
+\RequirePackage{hyperref}
+
+
+\SetupKeyvalOptions{
+  family=KTHFP,
+  prefix=KTHFP@
+}
+
+% define new booleans for options
+\newif\if@eng
+\newif\if@swe
+\newif\if@colour
+\newif\if@ireport
+\newif\if@exjobb
+\newif\if@lic
+\newif\if@doktor
+\newif\if@noimage
+
+% Default options:
+\@engtrue
+\@swefalse
+\@colourtrue
+\@exjobbtrue
+\@noimagefalse
+
+% declare options
+\DeclareStringOption{graphicspath}[/]
+\ProcessKeyvalOptions*
+%\ProcessOptions\relax
+
+% babel setting overrides the language set here!
+\AtBeginDocument{\@ifpackageloaded{babel}{\iflanguage{swedish}{\@swetrue\@engfalse}{}}{}}
+
+\newcommand\@ititle{}
+\newcommand\@isubtitle{}
+\newcommand\@iauthor{}
+\newcommand\@idate{}
+\newcommand\@irefnr{}
+\newcommand\@iaddress{}
+\newcommand\@inotice{}
+\newcommand\@iabstract{}
+\newcommand\@iapproved{}
+\newcommand\@icommissioner{}
+\newcommand\@icontact{}
+\newcommand\@isupervisor{}
+\newcommand\@iexaminer{}
+\newcommand\@iidentifier{}
+\newcommand\@ikeywords{}
+
+
+\newcommand{\ititle}[1]{%
+    \renewcommand\@ititle{#1}%
+}
+\newcommand{\isubtitle}[1]{%
+    \renewcommand\@isubtitle{#1}%
+}
+\newcommand{\iauthor}[1]{%
+    \renewcommand\@iauthor{#1}%
+}
+\newcommand{\idate}[1]{%
+    \renewcommand\@idate{#1}%
+}
+\newcommand{\irefnr}[1]{%
+    \renewcommand\@irefnr{#1}%
+}
+\newcommand{\iaddress}[1]{%
+    \renewcommand\@iaddress{#1}%
+}
+\newcommand{\iabstract}[1]{%
+    \renewcommand\@iabstract{#1}%
+}
+\newcommand{\iapproved}[1]{%
+    \renewcommand\@iapproved{#1}%
+}
+\newcommand{\icommissioner}[1]{%
+    \renewcommand\@icommissioner{#1}%
+}
+\newcommand{\icontact}[1]{%
+    \renewcommand\@icontact{#1}%
+}
+\newcommand{\isupervisor}[1]{%
+    \renewcommand\@isupervisor{#1}%
+}
+\newcommand{\iexaminer}[1]{%
+    \renewcommand\@iexaminer{#1}%
+}
+\newcommand{\iidentifier}[1]{%
+    \renewcommand\@iidentifier{#1}%
+}
+\newcommand{\ikeywords}[1]{%
+    \renewcommand\@ikeywords{#1}%
+}
+
+\newcommand{\submittedIEEE}[1]{\renewcommand{\@inotice}{
+    This work has been submitted to the IEEE for possible
+    publication. Copyright may be transferred without notice, after
+    which this version may no longer be accessible.}}
+\newcommand{\publishedIEEE}[1]{\renewcommand{\@inotice}{
+    \copyright{} #1 IEEE. Personal use of this material is
+    permitted. However, permission to reprint/republish this material
+    for advertising or promotional purposes or for creating new
+    collective works for resale or redistribution to servers or lists,
+    or to reuse any copyrighted component of this work in other works
+    must be obtained from the IEEE.}}
+
+\graphicspath{\KTHFP@graphicspath}
+
+\newcommand{\displayKTHlogo}{%
+\if@eng
+\if@noimage
+\mbox{}
+\else
+\if@colour
+  \includegraphics[width=32mm,keepaspectratio]{kth-logo-colour-eng}%
+\else
+  \if@ireport
+    %% Black white
+    \includegraphics[width=32mm,keepaspectratio]{kth-logo-bw-eng}%
+  \else% No logotype
+  \mbox{}
+  \fi
+\fi
+\fi
+\else\if@swe
+\if@noimage
+\mbox{}
+\else
+\if@colour
+  \includegraphics[width=32mm,keepaspectratio]{kth-logo-colour-swe}%
+\else
+  \if@ireport
+    %% Black white
+    \includegraphics[width=32mm,keepaspectratio]{kth-logo-bw-swe}%
+  \else% No logotype
+  \mbox{}
+  \fi
+\fi
+\fi
+\fi\fi
+}
+
+\newcommand{\ilang}[1][eng]{%
+\ifstrequal{#1}{eng}{
+    \@engtrue
+    \@swefalse
+}{}
+\ifstrequal{#1}{sv}{
+    \@swetrue
+    \@engfalse
+}{}
+\ifstrequal{#1}{swe}{
+    \@swetrue
+    \@engfalse
+}{}
+}
+
+\newcommand{\iprint}[1][forWWW]{%
+\ifstrequal{#1}{forWWW}{
+    \@colourtrue
+    \@noimagefalse
+}{}
+\ifstrequal{#1}{forPrint}{
+    \@colourfalse
+    \@noimagefalse
+}{}
+\ifstrequal{#1}{noimage}{
+    \@noimagetrue
+}{}
+}
+
+\newcommand{\itype}[1][ireport]{%
+\ifstrequal{#1}{ireport}{
+    \@ireporttrue\@exjobbfalse\@licfalse\@doktorfalse
+}{}
+\ifstrequal{#1}{exjobb}{
+    \@ireportfalse\@exjobbtrue\@licfalse\@doktorfalse
+}{}
+\ifstrequal{#1}{lic}{
+    \@ireportfalse\@exjobbfalse\@lictrue\@doktorfalse
+}{}
+\ifstrequal{#1}{doktor}{
+    \@ireportfalse\@exjobbfalse\@licfalse\@doktortrue
+}{}
+}
+
+% Page layout
+%\geometry{left=25mm,right=66mm,top=30mm,bottom=28mm,marginparsep=12mm,includemp=false,noheadfoot}
+
+\newlength{\titlep@getextwidth}
+\setlength{\titlep@getextwidth}{12cm}
+\newlength{\titlep@gewhitemargin}
+\setlength{\titlep@gewhitemargin}{54mm}
+\newlength{\titlep@geleftmargin}
+\setlength{\titlep@geleftmargin}{27mm}
+\newlength{\titlep@gemarginsep}
+\setlength{\titlep@gemarginsep}{9mm}
+\newlength{\titlep@getextheight}
+\setlength{\titlep@getextheight}{240mm}
+\newlength{\titlep@getopmargin}
+\setlength{\titlep@getopmargin}{35mm}
+\newlength{\tmpl@ngth}%
+
+\def\makeititle{
+  \begingroup
+  \if@twocolumn 
+  \onecolumn \m@keititle \twocolumn
+  \else \newpage
+  \global\@topnum\z@ \m@keititle \fi
+  \endgroup
+  \setcounter{footnote}{0}
+  \thispagestyle{empty}
+  \setcounter{page}{0} \newpage\pagecolor{white}
+  \if@twoside 
+      \setcounter{page}{0}\thispagestyle{empty}\cleardoublepage
+  \fi
+%  \let\makeititle\relax
+%  \let\@makeititle\relax
+%  \gdef\@iauthor{}\gdef\@ititle{}
+}
+
+\newcommand{\m@keititle}{%
+  \if@ireport%
+    \m@keireportititle%
+  \else%
+    \m@kethesisititle%
+  \fi%
+}
+
+% this is the new style for the title page of ireports
+\newcommand\m@keireportititle{%
+  % Move so the minipage of width linewidth is centered.
+  % \paperwidth = 1in + \hoffset + "leftmargin" + "rightmargin"
+  \setlength{\tmpl@ngth}{.5\linewidth-.5\paperwidth+\hoffset+1in}%
+  \if@twoside%
+    \addtolength{\tmpl@ngth}{\evensidemargin}%
+  \else%
+    \addtolength{\tmpl@ngth}{\oddsidemargin}%
+  \fi%
+  %\noindent\hspace*{-\tmpl@ngth}%
+  \makebox[0pt][l]{\begin{minipage}[t][0.95\textheight]{\linewidth}%
+  \sffamily%
+  \begin{center}
+    \displayKTHlogo \vfill
+    \sffamily%
+    \fontsize{20}{25}\selectfont\@ititle\\[5mm]
+    \fontsize{10}{12}\selectfont\mbox{}\@isubtitle\\[5mm]
+    \textit{\@inotice}\vfill
+    \fontsize{14}{18}\selectfont\MakeUppercase{\@iauthor}
+    \vfill\vfill\vfill
+    \fontsize{14}{18}\selectfont%
+    Stockholm \@idate\\
+    \rule{\linewidth}{1pt}
+    \@iaddress\\[5mm]
+  \end{center}
+  \fontsize{14}{18}\selectfont%
+  \@irefnr
+\end{minipage}}
+}
+
+% this is the new style for the title page of theses
+\newcommand\m@kethesisititle{%
+  \if@colour%
+    \if@exjobb%
+    \pagecolor[cmyk]{0,0.02,0.15,0.02}%
+    \fi%
+    \if@lic%
+    \pagecolor[cmyk]{0,0,0,0.27}%
+    \fi%
+    \if@doktor%
+    \pagecolor[cmyk]{1,0.55,0,0}%
+    \fi%
+  \fi%
+  \def\thefootnote{\fnsymbol{footnote}}%
+  \def\@makefnmark{\hbox to 0pt{$^{\@thefnmark}$\hss}}%
+  %
+  % Move to the top of the page
+  \setlength{\tmpl@ngth}{-\voffset-\topmargin-\headheight-\headsep-1in-2\baselineskip}%
+%  \mbox{}\vskip\tmpl@ngth%
+  \vspace*{\tmpl@ngth}%
+  %
+  % Move to \titlep@geleftmargin from the left edge of the paper
+  \setlength{\tmpl@ngth}{\titlep@geleftmargin-\hoffset-1in}%
+  \if@twoside%
+    \addtolength{\tmpl@ngth}{-\evensidemargin}%
+  \else%
+    \addtolength{\tmpl@ngth}{-\oddsidemargin}%
+  \fi%
+  \noindent\mbox{}\hspace*{\tmpl@ngth}%
+  %
+  % Fool LaTeX into beleiving that the contents doesn't
+  %  occupy any space 
+  \raisebox{0pt}[0pt][0pt]{\rlap{\mbox{%
+        \if@exjobb\relax\else%
+        \color{white}%
+        \fi%
+        % The text
+        \begin{minipage}[t][296mm]{\titlep@getextwidth}%
+          \vspace*{\titlep@getopmargin}%
+          \sffamily%
+          \raggedleft%
+          \parbox[b][96mm]{\linewidth}{%
+            \raggedleft\fontsize{20}{25}\selectfont\@ititle\vfill
+            %
+            \fontsize{10}{12}\selectfont\@isubtitle\vfill
+         }
+         {\fontsize{14}{18}\selectfont%
+           \rightline{\MakeUppercase{\@iauthor}}%
+         }%
+         \vfill%
+         \parbox[b][30mm]{\linewidth}{%
+           \raggedleft\fontsize{14}{18}\selectfont{}%
+           \if@eng%
+             \if@exjobb%
+               Master's Degree Project\\
+               Stockholm, Sweden \@idate
+             \fi
+             \if@lic
+               Licentiate Thesis\\
+               Stockholm, Sweden \@idate
+             \fi
+             \if@doktor
+               Doctoral Thesis\\
+               Stockholm, Sweden \@idate
+             \fi
+           \else\if@swe
+             \if@exjobb
+               Examensarbete\\
+               Stockholm, Sverige \@idate
+             \fi
+             \if@lic
+               Licentiatavhandling\\
+               Stockholm, Sverige \@idate
+             \fi
+             \if@doktor
+               Doktorsavhandling\\
+               Stockholm, Sverige \@idate
+             \fi
+           \fi\fi
+         }
+%        
+         \vskip1.5cm
+         {\fontsize{11}{14}\selectfont{}\@irefnr}
+         \vspace{28mm}
+      \end{minipage}%
+      \hspace{\titlep@gemarginsep}%
+      %
+      % The margin
+      %
+      \begin{minipage}[t]{\titlep@gewhitemargin}%
+        \raisebox{0pt}[0pt][0pt]{%
+          \setlength{\fboxsep}{0pt}%
+          % Add some extra height to avoid a yellow line at the bottom
+          \colorbox{white}{\parbox[t][310mm]{\linewidth}{%
+              \vspace*{120mm}
+              \centering\displayKTHlogo\\
+              \vfill}}}
+      \end{minipage}
+    }}
+  }
+}
+
+%******************************************************************************
+% Abstract, currently only supports one page
+%******************************************************************************
+
+\newcommand{\specialrow}[2]{\raisebox{2pt}{\footnotesize #1}\newline{\large #2}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}m{#1}}
+\newcolumntype{N}{@{}m{0pt}@{}}
+
+\def\makeiabstract{
+\enlargethispage{200.8347pt}
+    \pdfbookmark[1]{\if@eng%
+    Abstract%
+    \else\if@swe%
+    Sammanfattning\fi\fi}%
+    {\if@eng%
+    Abstract%
+    \else\if@swe%
+    Sammanfattning\fi\fi}
+    \begingroup
+    \if@twocolumn 
+    \onecolumn \thispagestyle{empty} \m@kethesisiabstract \twocolumn
+    \else \newpage
+    \global\@topnum\z@ \thispagestyle{empty} \m@kethesisiabstract \fi
+    \endgroup
+    \thispagestyle{empty}
+    \setcounter{page}{0} \newpage\pagecolor{white}
+    \if@twoside 
+        \setcounter{page}{0}\thispagestyle{empty}\cleardoublepage
+    \fi
+}
+
+\newcommand\m@kethesisiabstract{%
+
+\setlength{\tmpl@ngth}{-\voffset-\topmargin-\headheight-\headsep-2\baselineskip}
+  \vspace*{\tmpl@ngth}%
+  \setlength{\tmpl@ngth}{\titlep@geleftmargin-\hoffset-1in}%
+  \if@twoside%
+    \addtolength{\tmpl@ngth}{-\evensidemargin}%
+  \else%
+    \addtolength{\tmpl@ngth}{-\oddsidemargin}%
+  \fi%
+  \noindent\mbox{}\hspace*{\tmpl@ngth}%
+  %
+    \begin{minipage}[t][296mm]{148mm}%
+    \sffamily\selectfont
+         \begin{tabular}{|p{\linewidth/3}|p{\linewidth/3}|p{\linewidth/3}|}
+             \hline
+             \multicolumn{3}{|l|}{
+             \raisebox{-1.5cm}{
+             \displayKTHlogo }%\includegraphics[width=3cm,keepaspectratio]{kth-logo-colour-eng}}
+             \hspace{1cm}
+             \begin{minipage}[t]{2\linewidth/3}%
+             \begin{tabular}{c}
+                 \parbox[b]{\linewidth}{%
+                 \centering
+                 \textbf{\@iidentifier}
+                 } \\
+                 \\
+                 \parbox[b]{\linewidth}{%
+                 \centering
+                 \textbf{\@ititle}
+                 } \\
+                 \parbox[b]{\linewidth}{%
+                 \centering
+                 \textbf{\@isubtitle}
+                 } \\
+                 \\
+                 \parbox[b]{\linewidth}{%
+                 \centering
+                 \@iauthor 
+                 } \\
+                 \\
+             \end{tabular}
+             \end{minipage}
+             } \\
+             \hline \specialrow{%
+             \if@eng%
+             Approved%
+             \else\if@swe%
+             Godk\"{a}nd%
+             \fi\fi%
+             }{\@iapproved} & \specialrow{%
+             \if@eng%
+             Examiner%
+             \else\if@swe%
+             Examinator%
+             \fi\fi%
+             }{\@iexaminer} & \specialrow{%
+             \if@eng%
+             Supervisor%
+             \else\if@swe%
+             Handledare%
+             \fi\fi%
+             }{\@isupervisor} \\
+             \hline & \specialrow{%
+             \if@eng%
+             Commissioner%
+             \else\if@swe%
+             Uppdragsgivare%
+             \fi\fi%
+             }{\@icommissioner} & \specialrow{%
+             \if@eng%
+             Contact Person%
+             \else\if@swe%
+             Kontaktperson%
+             \fi\fi%
+             }{\@icontact} \\
+             \hline
+         \end{tabular}
+         \parbox[t]{1.085\linewidth}{%
+             \vspace{0.2cm}
+             \noindent {\LARGE
+             \if@eng%
+             Abstract%
+             \else\if@swe%
+             Sammanfattning%
+             \fi\fi%
+             } \hfill\\
+             \noindent \@iabstract
+             \vspace*{1cm}
+             \noindent\textbf{%
+             \if@eng%
+             Keywords:%
+             \else\if@swe%
+             Nyckelord:%
+             \fi\fi%
+             } \emph{\@ikeywords}
+         }
+    \end{minipage}
+}

@@ -1,0 +1,99 @@
+%
+% Example of the frontpages for a master thesis at KTH Industrial Engineering
+% and Management school
+% Created by hygerth on 2016-05-29.
+% Copyright (c) 2016 .
+\documentclass[11pt,oneside,a4paper]{article}
+
+\usepackage{KTHFrontpage} 
+\usepackage{lipsum}
+
+\newcommand{\myTitle}{My Title}
+\newcommand{\myTitleSWE}{Min Titel}
+\newcommand{\mySubtitle}{My Subtitle}
+\newcommand{\mySubtitleSWE}{Min Undertitel}
+\newcommand{\myAuthor}{John Appleseed}
+\newcommand{\myDate}{2016-05-29}
+\newcommand{\myAddress}{Master of Science Thesis INDEK 2016:XX\\ KTH Industrial Engineering and Management \\ Sustainability and Industrial Dynamics \\ SE-100 44 STOCKHOLM}
+\newcommand{\myAddressSWE}{Examensarbete INDEK 2016:XX\\ KTH Industriell teknik och management\\ H\r{a}llbarhet och Industriell Dynamik\\ SE-100 44 STOCKHOLM}
+\newcommand{\myAbstract}{\lipsum[1-5]}
+\newcommand{\myCommissioner}{JAVA Factory Inc.}
+\newcommand{\myContact}{Joe Java}
+\newcommand{\mySupervisor}{Jane Doe}
+\newcommand{\myExaminer}{John Doe}
+\newcommand{\myIdentifier}{Master of Science Thesis INDEK 2016:XX}
+\newcommand{\myIdentifierSWE}{Examensarbete INDEK 2016:XX}
+\newcommand{\myKeywords}{Java, programming, spaghetti, coffee}
+\newcommand{\myKeywordsSWE}{Java, programmering, spaghetti, kaffe}
+
+\begin{document}
+
+\ilang[eng]
+\ititle{\myTitle}
+\isubtitle{\mySubtitle}
+\iauthor{\myAuthor}
+\idate{\myDate}
+\makeititle
+
+\ilang[swe]
+\ititle{\myTitleSWE}
+\isubtitle{\mySubtitleSWE}
+\iauthor{\myAuthor}
+\idate{\myDate}
+\makeititle
+
+\ilang[eng]
+\itype[ireport]
+\iprint[noimage]
+\ititle{\myTitle}
+\isubtitle{\mySubtitle}
+\iauthor{\myAuthor}
+\idate{\myDate}
+\iaddress{\myAddress} 
+\makeititle
+
+\ilang[swe]
+\itype[ireport]
+\iprint[noimage]
+\ititle{\myTitleSWE}
+\isubtitle{\mySubtitleSWE}
+\iauthor{\myAuthor}
+\idate{\myDate}
+\iaddress{\myAddressSWE} 
+\makeititle
+
+\ilang[eng]
+\itype[ireport]
+\iprint[forWWW]
+\ititle{\myTitle}
+\isubtitle{\mySubtitle}
+\iauthor{\myAuthor}
+\idate{\myDate}
+\iabstract{\myAbstract}
+\iapproved{\myDate}
+\icommissioner{\myCommissioner}
+\icontact{\myContact}
+\isupervisor{\mySupervisor}
+\iexaminer{\myExaminer}
+\iidentifier{\myIdentifier}
+\ikeywords{\myKeywords}
+\makeiabstract
+
+\ilang[swe]
+\itype[ireport]
+\iprint[forWWW]
+\ititle{\myTitleSWE}
+\isubtitle{\mySubtitleSWE}
+\iauthor{\myAuthor}
+\idate{\myDate}
+\iabstract{\myAbstract}
+\iapproved{\myDate}
+\icommissioner{\myCommissioner}
+\icontact{\myContact}
+\isupervisor{\mySupervisor}
+\iexaminer{\myExaminer}
+\iidentifier{\myIdentifierSWE}
+\ikeywords{\myKeywordsSWE}
+\makeiabstract
+
+\end{document} 
