@@ -1,6 +1,6 @@
 # KTHFrontpage
 
-This is a modified version of the KTHEEtitlepage package (found [here](http://intra.ees.kth.se/en/2.25592/2.25633/latex-1.65629) or [here](https://www.sharelatex.com/templates/thesis/kth-master-thesis-reports)) that I used for my thesis at KTH. This modified version allows for simpler integration into a latex project and multiple title pages can be generated within the same document. Have also included a simple way to generate abstract pages for a thesis. See example.tex for how title and abstract pages can be included in a document. Images for documents not provided.
+This is a modified version of the KTHEEtitlepage package (found [here](http://intra.ees.kth.se/en/2.25592/2.25633/latex-1.65629) or [here](https://www.sharelatex.com/templates/thesis/kth-master-thesis-reports)) that I used for my thesis at KTH. This package has been modified to produce results that matches [this](http://www.kth.se/polopoly_fs/1.483193!/Exjobbmall%20framsidor%202011.docx) template. This modified version allows for simpler integration into a latex project and multiple title pages can be generated within the same document. Have also included a simple way to generate abstract pages for a thesis. See example.tex for how title and abstract pages can be included in a document. Images for documents not provided.
 
 <img src="example.png" width="480px"/>
 
